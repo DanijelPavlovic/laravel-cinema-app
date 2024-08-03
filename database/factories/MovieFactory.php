@@ -24,6 +24,7 @@ class MovieFactory extends Factory
             'room_id' => \App\Models\Room::factory(),
             'title' => $this->faker->sentence(3),
             'poster' => $this->faker->imageUrl(),
+            'duration' => $this->faker->randomElement([90, 120, 150, 180]),
             'start_time' => Carbon::now()->addHours(rand(1, 48)),
         ];
     }

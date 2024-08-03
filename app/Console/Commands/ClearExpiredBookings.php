@@ -20,7 +20,7 @@ class ClearExpiredBookings extends Command
     public function handle()
     {
         $now = Carbon::now();
-        $movies = Movie::where('start_time', '<', $now)->get();
+        $movies = Movie::whereRaw('DATE_ADD(start_time, INTERVAL duration MINUTE) < ?', [$now])->get();
 
         foreach ($movies as $movie) {
             $movie->bookings()->delete();

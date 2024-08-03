@@ -25,6 +25,7 @@ class MovieController extends Controller
             'room_id' => $request->room_id,
             'title' => $request->title,
             'poster' => $posterPath,
+            'duration' => $request->duration,
             'start_time' => $request->start_time,
         ]);
 
