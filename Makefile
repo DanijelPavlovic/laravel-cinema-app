@@ -27,3 +27,6 @@ schedule-run:
 
 schedule-list:
 	./vendor/bin/sail artisan schedule:list
+
+test:
+	./vendor/bin/sail test
