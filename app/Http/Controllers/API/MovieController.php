@@ -7,7 +7,6 @@ use App\Http\Requests\CreateMovieRequest;
 use App\Http\Requests\UpdateMovieRequest;
 use App\Models\Movie;
 use App\Models\Room;
-use Illuminate\Http\Request;
 
 class MovieController extends Controller
 {

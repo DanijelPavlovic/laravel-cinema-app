@@ -9,7 +9,7 @@ class Movie extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['room_id', 'title', 'poster', 'start_time'];
+    protected $fillable = ['room_id', 'title', 'poster', 'duration', 'start_time'];
 
     public function room()
     {
