@@ -25,7 +25,7 @@ class CreateMovieRequest extends FormRequest
             'room_id' => 'required',
             'title' => 'required',
             'poster' => 'required|image',
-            'duration' => 'required|image',
+            'duration' => 'required|integer',
             'start_time' => 'required|date',
         ];
     }

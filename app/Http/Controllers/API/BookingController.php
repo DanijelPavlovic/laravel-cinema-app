@@ -45,23 +45,33 @@ class BookingController extends Controller
 
     public function bookSeat(BookSeatRequest $request, Movie $movie)
     {
-        $existingBooking = Booking::where('movie_id', $movie->id)
-            ->where('row', $request->row)
-            ->where('seat', $request->seat)
-            ->first();
+        $seats = $request->input('seats');
+        $failedBookings = [];
 
-        if ($existingBooking) {
-            return response()->json(['message' => 'Seat already booked'], 409);
+        foreach ($seats as $seat) {
+            $existingBooking = Booking::where('movie_id', $movie->id)
+                ->where('row', $seat['row'])
+                ->where('seat', $seat['seat'])
+                ->first();
+
+            if ($existingBooking) {
+                $failedBookings[] = $seat;
+                continue;
+            }
+
+            $booking = new Booking([
+                'movie_id' => $movie->id,
+                'row' => $seat['row'],
+                'seat' => $seat['seat'],
+            ]);
+
+            $booking->save();
         }
 
-        $booking = new Booking([
-            'movie_id' => $movie->id,
-            'row' => $request->row,
-            'seat' => $request->seat,
-        ]);
+        if (!empty($failedBookings)) {
+            return response()->json(['message' => 'Some seats were already booked', 'failedBookings' => $failedBookings], 409);
+        }
 
-        $booking->save();
-
-        return response()->json($booking, 201);
+        return response()->json(['message' => 'All seats booked successfully'], 201);
     }
 }

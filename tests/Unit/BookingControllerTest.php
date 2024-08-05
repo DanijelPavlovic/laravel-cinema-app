@@ -80,26 +80,45 @@ class BookingControllerTest extends TestCase
     public function test_bookSeat_books_a_seat_for_a_movie()
     {
         $movie = Movie::factory()->create();
-        $seatData = ['row' => 2, 'seat' => 1];
+        $seatData = [
+            'seats' => [
+                ['row' => 2, 'seat' => 1],
+                ['row' => 3, 'seat' => 1],
+                ['row' => 4, 'seat' => 1],
+            ]
+        ];
 
         $response = $this->postJson(route('movies.bookSeat', $movie), $seatData);
 
         $response->assertStatus(201)
-            ->assertJsonFragment($seatData);
+            ->assertJson(['message' => 'All seats booked successfully']);
 
-        $this->assertDatabaseHas('bookings', array_merge($seatData, ['movie_id' => $movie->id]));
+        foreach ($seatData['seats'] as $seat) {
+            $this->assertDatabaseHas('bookings', array_merge($seat, ['movie_id' => $movie->id]));
+        }
     }
 
     public function test_bookSeat_returns_conflict_if_seat_already_booked()
     {
         $movie = Movie::factory()->create();
-        $seatData = ['row' => 3, 'seat' => 1];
+        $seatData = [
+            'seats' => [
+                ['row' => 3, 'seat' => 1],
+                ['row' => 4, 'seat' => 2]
+            ]
+        ];
 
-        Booking::create(array_merge($seatData, ['movie_id' => $movie->id]));
+        // Pre-book one of the seats
+        Booking::create(['movie_id' => $movie->id, 'row' => 3, 'seat' => 1]);
 
         $response = $this->postJson(route('movies.bookSeat', $movie), $seatData);
 
         $response->assertStatus(409)
-            ->assertJson(['message' => 'Seat already booked']);
+            ->assertJson([
+                'message' => 'Some seats were already booked',
+                'failedBookings' => [
+                    ['row' => 3, 'seat' => 1]
+                ]
+            ]);
     }
 }

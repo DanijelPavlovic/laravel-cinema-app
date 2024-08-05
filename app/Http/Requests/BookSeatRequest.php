@@ -22,8 +22,9 @@ class BookSeatRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'row' => 'required|integer',
-            'seat' => 'required|integer',
+            'seats' => 'required|array',
+            'seats.*.row' => 'required|integer',
+            'seats.*.seat' => 'required|integer',
         ];
     }
 }

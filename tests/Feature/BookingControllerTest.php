@@ -82,39 +82,60 @@ class BookingControllerTest extends TestCase
     public function test_bookSeat()
     {
         $movie = Movie::factory()->create();
-        $data = ['row' => 1, 'seat' => 1];
-
+        $data = [
+            'seats' => [
+                ['row' => 1, 'seat' => 1],
+                ['row' => 2, 'seat' => 1],
+            ]
+        ];
 
         $response = $this->postJson("/api/bookings/{$movie->id}/book", $data);
 
         $response->assertStatus(201)
-            ->assertJsonFragment($data);
+            ->assertJson(['message' => 'All seats booked successfully']);
 
-        $this->assertDatabaseHas('bookings', array_merge($data, ['movie_id' => $movie->id]));
+        foreach ($data['seats'] as $seat) {
+            $this->assertDatabaseHas('bookings', array_merge($seat, ['movie_id' => $movie->id]));
+        }
     }
 
     public function test_bookSeat_alreadyBooked()
     {
         $movie = Movie::factory()->create();
-        $booking = Booking::factory()->create(['movie_id' => $movie->id, 'row' => 1, 'seat' => 1]);
+        Booking::factory()->create(['movie_id' => $movie->id, 'row' => 1, 'seat' => 1]);
 
-        $data = ['row' => 1, 'seat' => 1];
+        $data = [
+            'seats' => [
+                ['row' => 1, 'seat' => 1],
+                ['row' => 2, 'seat' => 1]
+            ]
+        ];
 
         $response = $this->postJson("/api/bookings/{$movie->id}/book", $data);
 
         $response->assertStatus(409)
-            ->assertJson(['message' => 'Seat already booked']);
+            ->assertJson([
+                'message' => 'Some seats were already booked',
+                'failedBookings' => [
+                    ['row' => 1, 'seat' => 1]
+                ]
+            ]);
     }
 
     public function test_bookSeat_validation()
     {
         $movie = Movie::factory()->create();
 
-        $data = ['row' => '', 'seat' => ''];
+        $data = [
+            'seats' => [
+                ['row' => '', 'seat' => ''],
+                ['row' => null, 'seat' => null]
+            ]
+        ];
 
         $response = $this->postJson("/api/bookings/{$movie->id}/book", $data);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['row', 'seat']);
+            ->assertJsonValidationErrors(['seats.0.row', 'seats.0.seat', 'seats.1.row', 'seats.1.seat']);
     }
 }
