@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\Movie;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
 
 class ClearExpiredBookings extends Command
 {
@@ -19,12 +21,21 @@ class ClearExpiredBookings extends Command
 
     public function handle()
     {
-        $now = Carbon::now();
-        $movies = Movie::whereRaw('DATE_ADD(start_time, INTERVAL duration MINUTE) < ?', [$now])->get();
+        $now = Carbon::now()->toDateTimeString();
+        $this->info('Current time: ' . $now);
 
-        foreach ($movies as $movie) {
-            $movie->bookings()->delete();
-            $this->info('Cleared bookings for movie: ' . $movie->title);
+        $query = 'SELECT * FROM movies WHERE DATE_ADD(start_time, INTERVAL duration MINUTE) < ?';
+        $expiredMovies = DB::select($query, [$now]);
+        $this->info('Found ' . count($expiredMovies) . ' movies with expired bookings.');
+
+        foreach ($expiredMovies as $movieData) {
+
+            $movie = Movie::find($movieData->id);
+            if ($movie) {
+                $this->info('Clearing bookings for movie: ' . $movie->title . ' (ID: ' . $movie->id . ')');
+                $deletedCount = $movie->bookings()->delete();
+                $this->info('Deleted ' . $deletedCount . ' bookings.');
+            }
         }
 
         return 0;

@@ -25,6 +25,9 @@ list-routes:
 schedule-run:
 	./vendor/bin/sail artisan schedule:run
 
+schedule-work:
+	./vendor/bin/sail artisan schedule:work
+
 schedule-list:
 	./vendor/bin/sail artisan schedule:list
 

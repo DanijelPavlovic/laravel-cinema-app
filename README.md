@@ -22,6 +22,7 @@
 3. Run `composer install`
 4. Run `make start` to start the docker container 
 5. Run `make migrate` to create the database migrations
+6. Run `make schedule-work` to to start the schedule worker 
 
 
 ## Testing
