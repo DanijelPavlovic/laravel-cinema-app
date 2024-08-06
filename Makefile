@@ -33,3 +33,6 @@ schedule-list:
 
 test:
 	./vendor/bin/sail test
+
+link-storage:
+	./vendor/bin/sail artisan storage:link

@@ -7,6 +7,7 @@ use App\Http\Requests\CreateMovieRequest;
 use App\Http\Requests\UpdateMovieRequest;
 use App\Models\Movie;
 use App\Models\Room;
+use Illuminate\Support\Facades\Storage;
 
 class MovieController extends Controller
 {
@@ -17,13 +18,18 @@ class MovieController extends Controller
 
     public function store(CreateMovieRequest $request)
     {
+        $image = $request->file('poster');
 
-        $posterPath = $request->file('poster')->store('posters', 'public');
+        if ($image) {
+            $file_name = uniqid() . '.' . $image->getClientOriginalExtension();
+            Storage::disk('public')->putFileAs('images', $image, $file_name);
+            $posterUrl = Storage::disk('public')->url('images/' . $file_name);
+        }
 
         $movie = Movie::create([
             'room_id' => $request->room_id,
             'title' => $request->title,
-            'poster' => $posterPath,
+            'poster' => $posterUrl,
             'duration' => $request->duration,
             'start_time' => $request->start_time,
         ]);
@@ -39,18 +45,25 @@ class MovieController extends Controller
     public function update(UpdateMovieRequest $request, Movie $movie)
     {
 
-        $posterPath = $movie->poster;
-
         if ($request->hasFile('poster')) {
-            $posterPath = $request->file('poster')->store('posters', 'public');
+            $image = $request->file('poster');
+            $file_name = uniqid() . '.' . $image->getClientOriginalExtension();
+            Storage::disk('public')->putFileAs('images', $image, $file_name);
+            $posterUrl = Storage::disk('public')->url('images/' . $file_name);
         }
 
-        $movie->update([
+        $data = [
             'room_id' => $request->room_id,
             'title' => $request->title,
-            'poster' => $posterPath,
+            'duration' => $request->duration,
             'start_time' => $request->start_time,
-        ]);
+        ];
+
+        if (isset($posterUrl)) {
+            $data['poster'] = $posterUrl;
+        }
+
+        $movie->update($data);
 
         return response()->json($movie, 200);
     }

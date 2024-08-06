@@ -24,7 +24,6 @@ class CreateMovieRequest extends FormRequest
         return [
             'room_id' => 'required',
             'title' => 'required',
-            'poster' => 'required|image',
             'duration' => 'required|integer',
             'start_time' => 'required|date',
         ];

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateMovieRequest extends CreateMovieRequest
+class UpdateMovieRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,7 @@ class UpdateMovieRequest extends CreateMovieRequest
         return [
             'room_id' => 'required',
             'title' => 'required',
-            'poster' => 'sometimes|image',
+            'duration' => 'required|integer',
             'start_time' => 'required|date',
         ];
     }
