@@ -65,4 +65,10 @@ class MovieController extends Controller
     {
         return $room->movies;
     }
+
+    public function totalMovies()
+    {
+        $total = Movie::count();
+        return response()->json(['total' => $total], 200);
+    }
 }

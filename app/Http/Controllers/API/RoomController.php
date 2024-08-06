@@ -37,4 +37,10 @@ class RoomController extends Controller
         $room->delete();
         return response()->json(null, 204);
     }
+
+    public function totalRooms()
+    {
+        $total = Room::count();
+        return response()->json(['total' => $total], 200);
+    }
 }

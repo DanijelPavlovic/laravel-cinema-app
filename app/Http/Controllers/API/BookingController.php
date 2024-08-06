@@ -74,4 +74,10 @@ class BookingController extends Controller
 
         return response()->json(['message' => 'All seats booked successfully'], 201);
     }
+
+    public function totalBookings()
+    {
+        $total = Booking::count();
+        return response()->json(['total' => $total], 200);
+    }
 }
