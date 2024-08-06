@@ -15,16 +15,18 @@
 2. Create a `.env` file from `.env.example` and adjust the database params 
 	-  `DB_CONNECTION=mysql`
 	-  `DB_HOST=mysql`
-	- `DB_PORT=3306`
+	-  `DB_PORT=3306`
 	-  `DB_DATABASE=cinema`
-	- `DB_USERNAME=test`
-	- `DB_PASSWORD=test`
+	-  `DB_USERNAME=test`
+	-  `DB_PASSWORD=test`
+	-  `FORWARD_DB_PORT=33060`
 3. Run `composer install`
 4. Run `make start` to start the docker container 
 5. Run `make migrate` to create the database migrations
-6. Run `link-storage` to create the symlink to the storage folder
+6. Run `make link-storage` to create the symlink to the storage folder
 7. Run `make schedule-work` to to start the schedule worker 
 
+If you are using any external database management tool make sure that the `allowPublicKeyRetrieval` set to `true`
 
 ## Testing
 There are some feature and unit tests added for the controllers, run `make test` command to execute the tests
