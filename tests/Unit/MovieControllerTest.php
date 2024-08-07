@@ -29,8 +29,11 @@ class MovieControllerTest extends TestCase
     public function test_store()
     {
         Storage::fake('public');
+
         $room = Room::factory()->create();
+
         $file = UploadedFile::fake()->image('poster.jpg');
+
         $startTime = now()->format('Y-m-d H:i:s');
 
         $response = $this->postJson(route('movies.store'), [
@@ -44,8 +47,13 @@ class MovieControllerTest extends TestCase
         $response->assertStatus(201)
             ->assertJsonFragment(['title' => 'Test Movie']);
 
-        Storage::disk('public')->assertExists('posters/' . $file->hashName());
+        $responseData = $response->json();
+        $posterPath = parse_url($responseData['poster'], PHP_URL_PATH);
+        $posterPath = ltrim($posterPath, '/storage/');
+
+        Storage::disk('public')->assertExists($posterPath);
     }
+
 
     public function test_show()
     {
@@ -60,23 +68,32 @@ class MovieControllerTest extends TestCase
     public function test_update()
     {
         Storage::fake('public');
+
         $movie = Movie::factory()->create();
         $room = Room::factory()->create();
+
         $file = UploadedFile::fake()->image('new_poster.jpg');
+
         $startTime = now()->format('Y-m-d H:i:s');
 
-        $response = $this->putJson(route('movies.update', $movie->id), [
+        $response = $this->postJson(route('movies.update', $movie->id), [
             'room_id' => $room->id,
             'title' => 'Updated Movie',
             'poster' => $file,
+            'duration' => 120,
             'start_time' => $startTime,
         ]);
 
         $response->assertStatus(200)
             ->assertJsonFragment(['title' => 'Updated Movie']);
 
-        Storage::disk('public')->assertExists('posters/' . $file->hashName());
+        $responseData = $response->json();
+        $posterPath = parse_url($responseData['poster'], PHP_URL_PATH);
+        $posterPath = ltrim($posterPath, '/storage/');
+
+        Storage::disk('public')->assertExists($posterPath);
     }
+
 
     public function test_destroy()
     {
